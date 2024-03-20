@@ -26,6 +26,10 @@ const numbers = [
     }
 ]
 
+app.get("/info", (req, res) => {
+    res.send(`<div><p>Phonebook has info for ${numbers.length} people</p><p>${new Date}</p></div>`)
+})
+
 app.get("/api/persons", (req, res) => {
     res.json(numbers)
 })
