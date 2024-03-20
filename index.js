@@ -56,7 +56,7 @@ app.get("/api/persons/:id", (req, res) => {
         res.json(person)
     }
     else {
-        res.status(404).end()
+        res.status(404).json({ error:"person not found" })
     }
 })
 
