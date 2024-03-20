@@ -49,7 +49,7 @@ app.get("/api/persons/:id", (req, res) => {
 })
 
 app.post("/api/persons", (req, res) => {
-    let person = req.bod
+    let person = req.body
     person.id = Math.floor(Math.random()*100)
 
     if (!person.name || !person.number || person.name === "" || person.number === "") {
