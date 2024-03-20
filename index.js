@@ -14,7 +14,8 @@ app.use(morgan(function (tokens, req, res) {
       tokens['response-time'](req, res), 'ms',
       JSON.stringify(req.body)
     ].join(' ')
-  }))
+}))
+app.use(express.static('dist'))
 
 let numbers = [
     {
