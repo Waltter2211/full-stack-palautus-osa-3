@@ -3,7 +3,9 @@ const PORT = 3001
 
 const app = express()
 
-const numbers = [
+app.use(express.json())
+
+let numbers = [
     {
         id: 1,
         name: "Arto Hellas",
@@ -46,15 +48,29 @@ app.get("/api/persons/:id", (req, res) => {
     }
 })
 
-app.delete("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id)
-    const filtered = numbers.filter((number) => number.id !== id)
-    if (filtered.length === numbers.length) {
-        res.status(404).json({message:"person not found"})
+app.post("/api/persons", (req, res) => {
+    let person = req.body
+    person.id = Math.floor(Math.random()*100)
+
+    if (!person.name || !person.number || person.name === "" || person.number === "") {
+        res.status(404).json({ error:"please add name and number" })
     }
     else {
-        res.json(filtered)
+        const foundName = numbers.find((number) => number.name === person.name)
+        if (foundName) {
+            res.status(403).json({ error:"name must be unique" })
+        }
+        else {
+            numbers = numbers.concat(person)
+            res.json(person)
+        }
     }
+})
+
+app.delete("/api/persons/:id", (req, res) => {
+    const id = Number(req.params.id)
+    numbers = numbers.filter((number) => number.id !== id)
+    res.json(numbers)
 })
 
 app.listen(PORT)
