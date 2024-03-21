@@ -71,20 +71,20 @@ app.get("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
     let person = req.body
-    person.id = Math.floor(Math.random()*100)
 
     if (!person.name || !person.number || person.name === "" || person.number === "") {
         res.status(404).json({ error:"please add name and number" })
     }
     else {
-        const foundName = numbers.find((number) => number.name === person.name)
-        if (foundName) {
-            res.status(403).json({ error:"name must be unique" })
-        }
-        else {
-            numbers = numbers.concat(person)
-            res.json(person)
-        }
+        const personBody = new Person(person)
+        personBody.save()
+        .then(result => {
+            console.log(result)
+        })
+        .catch(err => {
+            console.log(err)
+            res.send(err.message)
+        })
     }
 })
 
