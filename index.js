@@ -103,7 +103,7 @@ app.put("/api/persons/:id", (req, res, next) => {
 
     Person.findByIdAndUpdate(req.params.id, person, { new: true })
     .then(updatedPerson => {
-        if (result !== null) {
+        if (updatedPerson !== null) {
             res.json(updatedPerson)
         }
         else {
