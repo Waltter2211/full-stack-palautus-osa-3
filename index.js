@@ -25,12 +25,15 @@ const unknownEndpoint = (request, response) => {
 }
   
 const errorHandler = (error, request, response, next) => {
-  
+
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
     }
-    else if (error.name === 'ValidationError') {
-        return response.status(500).send(error.errors.name.properties.message)
+    else if (error.name === 'ValidationError' && error.errors["name"]) {
+        return response.status(400).send(error.errors.name.properties.message)
+    }
+    else if (error.name === 'ValidationError' && error.errors["number"]) {
+        return response.status(400).send(error.errors.number.properties.message)
     }
     next(error)
 }
@@ -89,7 +92,8 @@ app.post("/api/persons", (req, res, next) => {
     let person = req.body
 
     if (!person.name || !person.number || person.name === "" || person.number === "") {
-        res.status(404).json({ error:"please add name and number" })
+        console.log("test")
+        res.status(500).send({ error:"please add name and number" })
     }
     else {
         Person.create(person)
