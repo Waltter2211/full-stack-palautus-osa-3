@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const Person = require('./models/persons')
+const persons = require('./models/persons')
 
 const PORT = process.env.PORT
 const app = express()
@@ -24,16 +25,17 @@ const unknownEndpoint = (request, response) => {
 }
   
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
   
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
     }
-  
+    else if (error.name === 'ValidationError') {
+        return response.status(500).send(error.errors.name.properties.message)
+    }
     next(error)
 }
 
-let numbers = [
+/* let numbers = [
     {
         id: 1,
         name: "Arto Hellas",
@@ -54,7 +56,7 @@ let numbers = [
         name: "Mary Poppendick",
         number: "39-23-6423122"
     }
-]
+] */
 
 app.get("/info", (req, res) => {
     res.send(`<div><p>Phonebook has info for ${numbers.length} people</p><p>${new Date}</p></div>`)
@@ -83,20 +85,18 @@ app.get("/api/persons/:id", (req, res, next) => {
     .catch(err => next(err))
 })
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
     let person = req.body
 
     if (!person.name || !person.number || person.name === "" || person.number === "") {
         res.status(404).json({ error:"please add name and number" })
     }
     else {
-        const personBody = new Person(person)
-        personBody.save()
+        Person.create(person)
         .then(result => {
-            console.log(result)
             res.json(result)
         })
-        .catch(err => next(err))
+        .catch(error => next(error))
     }
 })
 
