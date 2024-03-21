@@ -19,6 +19,20 @@ app.use(morgan(function (tokens, req, res) {
 }))
 app.use(express.static('dist'))
 
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({ error: 'unknown endpoint' })
+}
+  
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+  
+    if (error.name === 'CastError') {
+      return response.status(400).send({ error: 'malformatted id' })
+    }
+  
+    next(error)
+}
+
 let numbers = [
     {
         id: 1,
@@ -52,9 +66,7 @@ app.get("/api/persons", (req, res) => {
         console.log(result)
         res.json(result)
     })
-    .catch(err => {
-        console.log(err)
-    })
+    .catch(err => next(err))
 })
 
 app.get("/api/persons/:id", (req, res) => {
@@ -63,10 +75,7 @@ app.get("/api/persons/:id", (req, res) => {
     .then(result => {
         res.json(result)
     })
-    .catch(err => {
-        console.log(err)
-        res.status(404).json({ error:"person not found" })
-    })
+    .catch(err => next(err))
 })
 
 app.post("/api/persons", (req, res) => {
@@ -82,20 +91,43 @@ app.post("/api/persons", (req, res) => {
             console.log(result)
             res.json(result)
         })
-        .catch(err => {
-            console.log(err)
-            res.json(err.message)
-        })
+        .catch(err => next(err))
     }
 })
 
-app.delete("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
+    const person = {
+        name: req.body.name,
+        number: req.body.number
+    }
+
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+        if (result !== null) {
+            res.json(updatedPerson)
+        }
+        else {
+            next()
+        }
+    })
+    .catch(err => next(err))
+})
+
+app.delete("/api/persons/:id", (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
     .then(result => {
-        res.status(204).end()
+        if (result !== null) {
+            res.status(204).end()
+        }
+        else {
+            next()
+        }
     })
     .catch(error => next(error))
 })
+
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 app.listen(PORT)
 console.log(`Server running on ${PORT}`)
