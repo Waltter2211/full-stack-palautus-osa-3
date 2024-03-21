@@ -80,10 +80,11 @@ app.post("/api/persons", (req, res) => {
         personBody.save()
         .then(result => {
             console.log(result)
+            res.json(result)
         })
         .catch(err => {
             console.log(err)
-            res.send(err.message)
+            res.json(err.message)
         })
     }
 })
