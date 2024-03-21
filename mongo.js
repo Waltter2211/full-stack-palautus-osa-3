@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const password = process.argv[2]
 
-const url = `MONGO`
+const url = `mongodb+srv://waltterS2211:${password}@cluster0.opxvebm.mongodb.net/personApp?retryWrites=true&w=majority&appName=Cluster0`
 
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
