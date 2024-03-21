@@ -69,11 +69,16 @@ app.get("/api/persons", (req, res) => {
     .catch(err => next(err))
 })
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
     const id = req.params.id
     Person.findOne({_id: id})
     .then(result => {
-        res.json(result)
+        if (result !== null) {
+            res.json(result)
+        }
+        else {
+            next()
+        }
     })
     .catch(err => next(err))
 })
